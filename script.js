@@ -40,10 +40,7 @@ class Process {
   crash() {
     if (this.isCrashed) return;
     this.isCrashed = true;
-    console.log(`[P${this.id}] HAS CRASHED!`);
-    
-    const d3Node = nodesData.find(n => n.id === this.id);
-    if (d3Node) d3Node.isCrashed = true;
+    simulation.alpha(0.1).restart();
   }
 }
 
@@ -195,7 +192,6 @@ simulation.on("tick", () => {
     .merge(crosses)
     .attr("d", d => {
         const s = 10;
-        // Fixed syntax error here
         return `M ${d.x - s} ${d.y - s} L ${d.x + s} ${d.y + s} M ${d.x + s} ${d.y - s} L ${d.x - s} ${d.y + s}`;
     });
 });
