@@ -40,7 +40,7 @@ class Process {
   crash() {
     if (this.isCrashed) return;
     this.isCrashed = true;
-    simulation.alpha(0.1).restart();
+    updateGraphState();
   }
 }
 
@@ -75,6 +75,26 @@ processes.forEach(p => {
     }
   });
 });
+
+function updateGraphState() {
+  // 1. Aggiorna immediatamente il colore dei nodi (rosso se crashati)
+  node.attr("fill", d => d.isCrashed ? "red" : "steelblue");
+
+  // 2. Lega i dati delle croci ai processi crashati
+  const crosses = crashLayer.selectAll("path.crash-mark")
+    .data(nodesData.filter(d => d.isCrashed), d => d.id);
+    
+  // 3. Crea la X bianca SOLO per i nodi appena crashati
+  crosses.enter()
+    .append("path")
+    .attr("class", "crash-mark")
+    .attr("stroke", "white")
+    .attr("stroke-width", 4);
+
+  // 4. Risveglia brevemente la simulazione fisica per aggiornare 
+  // le coordinate (d.x e d.y) della nuova croce appena creata
+  simulation.alpha(0.1).restart();
+}
 
 const svg = d3.select("#graph-container")
   .append("svg")
@@ -155,6 +175,7 @@ function animateMessage(sourceId, targetId) {
 }
 
 simulation.on("tick", () => {
+  // Aggiorna le linee di connessione
   link.attr("d", d => {
     if (d.source.id === d.target.id) {
       const x = d.source.x;
@@ -165,31 +186,24 @@ simulation.on("tick", () => {
       const x2 = x + loopRadius;
       const y2 = y - loopRadius;
 
-      // Fixed syntax error here
       return `M ${x - 10} ${y - nodeRadius + 5} C ${x1} ${y1}, ${x2} ${y2}, ${x + 10} ${y - nodeRadius + 5}`;    
     } else { 
       return `M ${d.source.x} ${d.source.y} L ${d.target.x} ${d.target.y}`;
     }
   });
 
+  // Aggiorna solo la posizione dei cerchi (il colore è ora gestito in updateGraphState)
   node
     .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("fill", d => d.isCrashed ? "red" : "steelblue");
+    .attr("cy", d => d.y);
     
+  // Aggiorna la posizione dei testi
   text
     .attr("x", d => d.x)
     .attr("y", d => d.y);
 
-  const crosses = crashLayer.selectAll("path.crash-mark")
-    .data(nodesData.filter(d => d.isCrashed), d => d.id);
-    
-  crosses.enter()
-    .append("path")
-    .attr("class", "crash-mark")
-    .attr("stroke", "white")
-    .attr("stroke-width", 4)
-    .merge(crosses)
+  // Aggiorna SOLO la posizione delle croci (senza ricrearle o fare merge)
+  crashLayer.selectAll("path.crash-mark")
     .attr("d", d => {
         const s = 10;
         return `M ${d.x - s} ${d.y - s} L ${d.x + s} ${d.y + s} M ${d.x + s} ${d.y - s} L ${d.x - s} ${d.y + s}`;
