@@ -9,15 +9,6 @@ class Process {
       this.connections.push(otherProcess);
     }
   }
-
-  broadcast(message) {
-    console.log(`[Process ${this.id}] Broadcasting message: "${message}"`);
-    this.connections.forEach(peer => peer.receive(message, this.id));
-  }
-
-  receive(message, senderId) {
-    console.log(`[Process ${this.id}] Received "${message}" from Process ${senderId}`);
-  }
 }
 
 // 1. Initialize processes
@@ -29,12 +20,12 @@ const processes = [p1, p2, p3, p4];
 
 // 2. Connect everyone with everyone
 processes.forEach(p => {
-  processes.forEach(
-      p.connect(other)
+  processes.forEach(proccess =>{
+      p.connect(proccess)
+    }
   );
 });
 
-p1.broadcast("Hello World!");
 
 // ---------------------------------------------------
 // D3.js VISUALIZATION LOGIC
@@ -44,7 +35,7 @@ const width = 600;
 const height = 400;
 
 // Format your data for D3
-const nodesData = processes.map(p => ({ id: p.id }));
+const nodesData = processes.map(p => ({ id: p.id })); //capire cosa fa
 const linksData = [];
 processes.forEach(p => {
   p.connections.forEach(peer => {
