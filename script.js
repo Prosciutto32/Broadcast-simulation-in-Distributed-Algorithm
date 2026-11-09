@@ -108,9 +108,8 @@ simulation.on("tick", () => {
       const x2 = x + loopRadius;
       const y2 = y - loopRadius;
 
-      return `M ${x - 10} ${y - nodeRadius + 5} C ${x1} ${y1}, ${x2} ${y2}, ${x + 10} ${y - nodeRadius + 5}`;
-    } else {
-      // Standard straight connection path
+      return `M ${x - 10} ${y - nodeRadius + 5} C ${x1} ${y1}, ${x2} ${y2}, ${x + 10} ${y - nodeRadius + 5}`;    
+    } else{ // Standard straight connection path
       return `M ${d.source.x} ${d.source.y} L ${d.target.x} ${d.target.y}`;
     }
   });
