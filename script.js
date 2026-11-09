@@ -77,25 +77,7 @@ processes.forEach(p => {
   });
 });
 
-function updateGraphState() {
-  // 1. Aggiorna immediatamente il colore dei nodi (rosso se crashati)
-  node.attr("fill", d => d.isCrashed ? "red" : "steelblue");
 
-  // 2. Lega i dati delle croci ai processi crashati
-  const crosses = crashLayer.selectAll("path.crash-mark")
-    .data(nodesData.filter(d => d.isCrashed), d => d.id);
-    
-  // 3. Crea la X bianca SOLO per i nodi appena crashati
-  crosses.enter()
-    .append("path")
-    .attr("class", "crash-mark")
-    .attr("stroke", "white")
-    .attr("stroke-width", 4);
-
-  // 4. Risveglia brevemente la simulazione fisica per aggiornare 
-  // le coordinate (d.x e d.y) della nuova croce appena creata
-  simulation.alpha(0.1).restart();
-}
 
 const svg = d3.select("#graph-container")
   .append("svg")
@@ -139,6 +121,27 @@ const text = textLayer
   .attr("text-anchor", "middle")
   .attr("dy", 4);
 
+
+function updateGraphState() {
+  // 1. Aggiorna immediatamente il colore dei nodi (rosso se crashati)
+  node.attr("fill", d => d.isCrashed ? "red" : "steelblue");
+
+  // 2. Lega i dati delle croci ai processi crashati
+  const crosses = crashLayer.selectAll("path.crash-mark")
+    .data(nodesData.filter(d => d.isCrashed), d => d.id);
+    
+  // 3. Crea la X bianca SOLO per i nodi appena crashati
+  crosses.enter()
+    .append("path")
+    .attr("class", "crash-mark")
+    .attr("stroke", "white")
+    .attr("stroke-width", 4);
+
+  // 4. Risveglia brevemente la simulazione fisica per aggiornare 
+  // le coordinate (d.x e d.y) della nuova croce appena creata
+  simulation.alpha(0.1).restart();
+}
+
 function animateMessage(sourceId, targetId) {
   const sourceNode = nodesData.find(n => n.id === sourceId);
   const targetNode = nodesData.find(n => n.id === targetId);
@@ -174,6 +177,7 @@ function animateMessage(sourceId, targetId) {
       });
   }
 }
+
 
 simulation.on("tick", () => {
   // Aggiorna le linee di connessione
