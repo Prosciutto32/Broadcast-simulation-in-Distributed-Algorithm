@@ -29,11 +29,9 @@ const processes = [p1, p2, p3, p4];
 
 // 2. Connect everyone with everyone
 processes.forEach(p => {
-  processes.forEach(other => {
-    if (p.id !== other.id) {
-      p.connect(other);
-    }
-  });
+  processes.forEach(
+      p.connect(other)
+  );
 });
 
 p1.broadcast("Hello World!");
@@ -72,7 +70,8 @@ const link = svg.append("g")
   .data(linksData)
   .enter().append("line")
   .attr("stroke", "#999")
-  .attr("stroke-width", 2);
+  .attr("stroke-width", 2)
+  .attr("stroke-dasharray", "4,4");;
 
 // Draw circles for processes
 const node = svg.append("g")
