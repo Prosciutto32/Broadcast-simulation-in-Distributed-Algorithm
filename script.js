@@ -40,6 +40,7 @@ class Process {
   crash() {
     if (this.isCrashed) return;
     this.isCrashed = true;
+    nodesData.find(n => n.id === this.id).isCrashed = true;
     updateGraphState();
   }
 }
