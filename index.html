@@ -15,5 +15,26 @@
     
     <!-- Properly load your script file at the end of the body -->
     <script src="script.js"></script>
+    <div class="controls">
+        <div class="process-controls">
+            <strong>P1</strong>
+            <button onclick="processes[0].broadcast('Hello from 1')">Broadcast</button>
+            <button onclick="processes[0].crash()">Crash</button>
+        </div>
+        <div class="process-controls">
+            <strong>P2</strong>
+            <button onclick="processes[1].broadcast('Hello from 2')">Broadcast</button>
+            <button onclick="processes[1].crash()">Crash</button>
+        </div>
+        <div class="process-controls">
+            <strong>P3</strong>
+            <button onclick="processes[2].broadcast('Hello from 3')">Broadcast</button>
+            <button onclick="processes[2].crash()">Crash</button>
+        </div>
+        <div class="process-controls">
+            <strong>P4</strong>
+            <button onclick="processes[3].broadcast('Hello from 4')">Broadcast</button>
+            <button onclick="processes[3].crash()">Crash</button>
+        </div>
 </body>
 </html>
