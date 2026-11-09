@@ -97,23 +97,36 @@ const text = svg.append("g")
 simulation.on("tick", () => {
   link.attr("d", d => {
     if (d.source.id === d.target.id) {
-      // Self-loop math: Draw a cubic Bezier curve exiting top-left and entering top-right of the node
       const x = d.source.x;
       const y = d.source.y;
-      
-      const loopRadius = 35;
-      const x1 = x - loopRadius;
-      const y1 = y - loopRadius;
-      const x2 = x + loopRadius;
-      const y2 = y - loopRadius;
 
-      return `M ${x - 10} ${y - nodeRadius + 5} C ${x1} ${y1}, ${x2} ${y2}, ${x + 10} ${y - nodeRadius + 5}`;
+      // 1. Calculate angle pointing radially outward from center of canvas
+      const angle = Math.atan2(y - centerY, x - centerX);
+
+      // 2. Perpendicular angle offset for start/end points on circle rim
+      const spreadAngle = 0.45; // radians (~25 deg)
+      const startAngle = angle - spreadAngle;
+      const endAngle = angle + spreadAngle;
+
+      // Start & End points anchored on the circle boundary
+      const startX = x + nodeRadius * Math.cos(startAngle);
+      const startY = y + nodeRadius * Math.sin(startAngle);
+      const endX = x + nodeRadius * Math.cos(endAngle);
+      const endY = y + nodeRadius * Math.sin(endAngle);
+
+      // 3. Control points pushed farther out along the angle vector
+      const loopDistance = 55; // Distance loop extends outward
+      const cp1X = startX + loopDistance * Math.cos(angle - 0.2);
+      const cp1Y = startY + loopDistance * Math.sin(angle - 0.2);
+      const cp2X = endX + loopDistance * Math.cos(angle + 0.2);
+      const cp2Y = endY + loopDistance * Math.sin(angle + 0.2);
+
+      return `M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${endY}`;
     } else {
-      // Standard straight connection path
-      return `M ${d.source.x} ${d.source.y} L ${d.target.x} ${d.target.y}`;
+    // Standard straight connection path
+    return `M ${d.source.x} ${d.source.y} L ${d.target.x} ${d.target.y}`;
     }
   });
-
   node
     .attr("cx", d => d.x)
     .attr("cy", d => d.y);
