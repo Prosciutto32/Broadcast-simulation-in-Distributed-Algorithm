@@ -33,13 +33,23 @@ processes.forEach(p => {
 
 const width = 600;
 const height = 400;
+const nodeRadius = 20;
 
 // Format your data for D3
 const nodesData = processes.map(p => ({ id: p.id })); //capire cosa fa
 const linksData = [];
+const seenLinks = new Set();
+
+
 processes.forEach(p => {
   p.connections.forEach(peer => {
-    linksData.push({ source: p.id, target: peer.id });
+    const isSelfLoop = p.id === peer.id;
+    const linkKey = isSelfLoop ? `self-${p.id}` : [p.id, peer.id].sort().join("-");
+    
+    if (!seenLinks.has(linkKey)) {
+      seenLinks.add(linkKey);
+      linksData.push({ source: p.id, target: peer.id, isSelf: isSelfLoop });
+    }
   });
 });
 
@@ -57,9 +67,9 @@ const simulation = d3.forceSimulation(nodesData)
 
 // Draw lines for connections
 const link = svg.append("g")
-  .selectAll("line")
+  .selectAll("path")
   .data(linksData)
-  .enter().append("line")
+  .enter().append("path")
   .attr("stroke", "#999")
   .attr("stroke-width", 2)
   .attr("stroke-dasharray", "4,4");;
@@ -69,7 +79,7 @@ const node = svg.append("g")
   .selectAll("circle")
   .data(nodesData)
   .enter().append("circle")
-  .attr("r", 20)
+  .attr("r", nodeRadius)
   .attr("fill", "steelblue");
 
 // Add text labels to the nodes
@@ -85,11 +95,24 @@ const text = svg.append("g")
 
 // Update positions on every tick of the physics engine
 simulation.on("tick", () => {
-  link
-    .attr("x1", d => d.source.x)
-    .attr("y1", d => d.source.y)
-    .attr("x2", d => d.target.x)
-    .attr("y2", d => d.target.y);
+  link.attr("d", d => {
+    if (d.source.id === d.target.id) {
+      // Self-loop math: Draw a cubic Bezier curve exiting top-left and entering top-right of the node
+      const x = d.source.x;
+      const y = d.source.y;
+      
+      const loopRadius = 35;
+      const x1 = x - loopRadius;
+      const y1 = y - loopRadius;
+      const x2 = x + loopRadius;
+      const y2 = y - loopRadius;
+
+      return `M ${x - 10} ${y - nodeRadius + 5} C ${x1} ${y1}, ${x2} ${y2}, ${x + 10} ${y - nodeRadius + 5}`;
+    } else {
+      // Standard straight connection path
+      return `M ${d.source.x} ${d.source.y} L ${d.target.x} ${d.target.y}`;
+    }
+  });
 
   node
     .attr("cx", d => d.x)
