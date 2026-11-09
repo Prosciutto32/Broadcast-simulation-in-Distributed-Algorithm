@@ -25,13 +25,10 @@ class Process {
       }
 
       // Evitiamo di inviare graficamente un messaggio a se stessi per chiarezza visiva
-      if (peer.id !== this.id) {
-        // Disegna l'animazione della pallina nel DOM
-        animateMessage(this.id, peer.id);
+      animateMessage(this.id, peer.id);
         
-        // Simula la ricezione lato logico con un timeout di RTT/2
-        peer.receive(message, this.id);
-      }
+      // Simula la ricezione lato logico con un timeout di RTT/2
+      peer.receive(message, this.id);
       
       // Attesa asincrona prima di inviare al nodo successivo
       await new Promise(res => setTimeout(res, INTER_SEND_DELAY));
